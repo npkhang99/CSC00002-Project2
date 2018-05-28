@@ -24,10 +24,10 @@ def eval():
     print("Correct percentage: {}/{}, {:.2f} percent".format(correct, n, correct / n * 100))
 
 def predict(recognizer, img):
-    print('Predicting...')
+    # print('Predicting...')
     # img = dataset.resize_image(img, (300,300))
     Id, percent = recognizer.predict(img)
-    return Id
+    return Id, percent
 
 def main():
     eval()

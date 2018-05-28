@@ -13,6 +13,8 @@ def main(picture):
     face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     img = cv2.imread(picture)
 
+    pic_w, pic_h, pic_d = img.shape
+
     # img = scale_image(img, 1.5)
 
     # cv2.imshow('source', img)
@@ -24,7 +26,7 @@ def main(picture):
         gray,
         scaleFactor = 1.1,
         minNeighbors = 5,
-        minSize = (10, 10),
+        minSize = (100, 100),
         flags = cv2.CASCADE_SCALE_IMAGE
     )
 
@@ -37,28 +39,52 @@ def main(picture):
         recognizer = cv2.face.LBPHFaceRecognizer_create()
         recognizer.read(cfg.MODEL_PATH)
 
-    for k in range(len(faces)):
-        # get the face's coords and dimensions
-        x, y, h, w = faces[k]
+    for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x - 2, y - 2), (x + w + 2, y + h + 5), (255, 0, 0), 5)
+        predict_id, percent = predict(recognizer, gray[y : y + h, x : x + w])
+        name = get_name_with_uid(predict_id) + ' - {:.2f}'.format(percent)
+        cv2.putText(img, name, (x, y + h), 0, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
-        # resize cropped face array to the correct size
-        face.resize((h, w, 3))
+    cv2.imwrite('image.jpg', img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
-        # copy to the face to face array
-        for i in range(w):
-            for j in range(h):
-                face[i][j] = img[y + i][x + j]
+def show_video():
+    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    video = cv2.VideoCapture(0)
 
-        face_gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    recognizer.read(cfg.MODEL_PATH)
 
-        predict_id = predict(recognizer, face_gray)
-        # show face and id
-        cv2.imshow(str(get_name_with_uid(predict_id)), face)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+
+    while True:
+        ret, img = video.read()
+        if not ret:
+            break
+        img = cv2.flip(img, 1)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(
+            gray,
+            scaleFactor = 1.1,
+            minNeighbors = 5,
+            minSize = (100, 100),
+            flags = cv2.CASCADE_SCALE_IMAGE
+        )
+
+        for (x, y, w, h) in faces:
+            cv2.rectangle(img, (x - 2, y - 2), (x + w + 2, y + h + 5), (255, 255, 0), 2)
+            predict_id, percent = predict(recognizer, gray[y : y + h, x : x + w])
+            name = get_name_with_uid(predict_id) + ' - {:.2f}'.format(percent)
+            cv2.putText(img, name, (x, y + h), 0, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+
+        cv2.imshow('video', img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
         main(sys.argv[1])
+    elif len(sys.argv) == 1:
+        show_video()
     else:
         print("ERROR")
