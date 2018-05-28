@@ -4,6 +4,7 @@ import glob
 import json
 import random
 import json
+import os
 
 import config as cfg
 
@@ -17,10 +18,10 @@ def create_meta_file(path):
     uid = {}
     cnt = 0
     for folder in sorted(glob.glob(path + '*/')):
+        cnt += 1
         print('Processing {:>30s}- uid: {}'.format(folder, cnt))
         name = folder.split('/')[-2]
         uid[name] = cnt
-        cnt += 1
         files = glob.glob(folder + '*')
         random.shuffle(files)
         n = len(files)
@@ -28,13 +29,13 @@ def create_meta_file(path):
         test[name] = []
         train[name] = []
         for i in range(int(n * cfg.TEST_RATIO)):
-            test[name].append(files[0])
+            test[name].append(os.path.abspath(files[0]))
             files.pop(0)
         for i in range(int(n * cfg.VALIDATE_RATIO)):
-            validate[name].append(files[0])
+            validate[name].append(os.path.abspath(files[0]))
             files.pop(0)
         for i in range(int(n * cfg.TRAIN_RATIO)):
-            train[name].append(files[0])
+            train[name].append(os.path.abspath(files[0]))
             files.pop(0)
     
     # print meta files
@@ -58,4 +59,4 @@ def main(path):
     create_meta_file(path)
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    main(cfg.DATA_PATH)

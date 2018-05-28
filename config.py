@@ -1,3 +1,6 @@
 TRAIN_RATIO = 0.5
 VALIDATE_RATIO = 0.0
 TEST_RATIO = 0.5
+
+DATA_PATH = './CNTN2017-faces/'
+MODEL_PATH = './cv2_model'
