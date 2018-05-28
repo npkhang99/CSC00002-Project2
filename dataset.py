@@ -12,6 +12,20 @@ def resize_image(img, size):
     img = cv2.resize(img, size, interpolation = cv2.INTER_AREA)
     return img
 
+def scale_image(img, scale):
+    h, w, d = img.shape
+    img = cv2.resize(img, (int(w * scale), int(h * scale)), interpolation = cv2.INTER_AREA)
+    return img
+
+def get_name_with_uid(uid):
+    uid_json = json.load(open("uid.json",'r'))
+    name = 'Unknow'
+    for user in uid_json:
+        if uid_json[user] == uid:
+            name = user
+            break
+    return name
+
 def load_train_images_and_ids(resize = False, size = (200,200)):
     faces = []
     ids = []
