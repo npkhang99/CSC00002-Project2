@@ -24,9 +24,9 @@ def main(picture):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(
         gray,
-        scaleFactor = 1.1,
+        scaleFactor = 1.2,
         minNeighbors = 5,
-        minSize = (100, 100),
+        minSize = (10, 10),
         flags = cv2.CASCADE_SCALE_IMAGE
     )
 
@@ -42,8 +42,8 @@ def main(picture):
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x - 2, y - 2), (x + w + 2, y + h + 5), (255, 0, 0), 5)
         predict_id, percent = predict(recognizer, gray[y : y + h, x : x + w])
-        name = get_name_with_uid(predict_id) + ' - {:.2f}'.format(percent)
-        cv2.putText(img, name, (x, y + h), 0, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+        name = get_name_with_uid(predict_id)
+        cv2.putText(img, name, (x, y + h), 0, 0.5, (255, 255, 0), 1, cv2.LINE_AA)
 
     cv2.imwrite('image.jpg', img)
     # cv2.waitKey(0)
@@ -65,7 +65,7 @@ def show_video():
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(
             gray,
-            scaleFactor = 1.1,
+            scaleFactor = 1.2,
             minNeighbors = 5,
             minSize = (100, 100),
             flags = cv2.CASCADE_SCALE_IMAGE
@@ -74,7 +74,7 @@ def show_video():
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x - 2, y - 2), (x + w + 2, y + h + 5), (255, 255, 0), 2)
             predict_id, percent = predict(recognizer, gray[y : y + h, x : x + w])
-            name = get_name_with_uid(predict_id) + ' - {:.2f}'.format(percent)
+            name = get_name_with_uid(predict_id)
             cv2.putText(img, name, (x, y + h), 0, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
 
         cv2.imshow('video', img)
